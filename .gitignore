@@ -1,0 +1,14 @@
+# Binaries
+main
+go-api-server
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
