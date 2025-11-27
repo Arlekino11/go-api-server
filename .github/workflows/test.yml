@@ -3,10 +3,10 @@ name: Run Tests
 on:
   push:
     branches:
-      -main
+      - main
   pull_request:
     branches:
-      -main
+      - main
 
 jobs:
   test:
@@ -40,7 +40,7 @@ jobs:
       - name: Run tests
         run: go test -v ./...
         env:
-          DB_MOST: localhost
+          DB_HOST: localhost
           DB_PORT: 5432
           DB_USER: postgres
           DB_PASSWORD: admin
