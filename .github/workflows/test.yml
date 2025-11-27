@@ -1,0 +1,44 @@
+name: run test
+on:
+ push:
+  branches: [ main ]
+ pull_request:
+  branches: [ main ]
+
+jobs:
+ test:
+  runs-on: ubuntu-latest
+
+  services:
+   postgres:
+    image: postgres:18
+    env:
+     POSTGRES_PASSWORD: admin
+     POSTGRES_DB: go_leatning_test
+    options: >-
+     --health-cmd pg_isready
+     --health-interval 10s
+     --health-timeout 5s
+     --health-retries 5
+    ports:
+     - 5433:5432
+
+steps:
+- uses: actions/setup-go@v3
+
+- name: Set up Go
+  uses: actions/setup-go@v3
+  with:
+   go-version: 1.25
+
+- name: Build
+  run: go build -v ./...
+
+- name: Run tests
+  run: go test -v ./...
+  env:
+   DB_HOST: localhost
+   DB_PORT: 5433
+   DB_USER: postgres
+   DB_PASSWORD: admin
+   DB_NAME: go_learning_test

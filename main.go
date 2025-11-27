@@ -6,11 +6,42 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 )
+
+var dbConfig = struct {
+	Host     string
+	Port     int
+	User     string
+	Password string
+	DBName   string
+}{
+	Host:     getEnv("DB_HOST", "localhost"),
+	Port:     getEnvInt("DB_PORT", 5433),
+	User:     getEnv("DB_USER", "postgres"),
+	Password: getEnv("DB_PASSWORD", "admin"),
+	DBName:   getEnv("DB_NAME", "go_learning"),
+}
+
+func getEnv(key string, defaultValue string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+	return defaultValue
+}
+
+func getEnvInt(key string, defaultValue int) int {
+	if value := os.Getenv(key); value != "" {
+		if intValue, err := strconv.Atoi(value); err == nil {
+			return intValue
+		}
+	}
+	return defaultValue
+}
 
 const (
 	host     = "localhost"
@@ -29,7 +60,7 @@ type User struct {
 var db *sql.DB
 
 func main() {
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", dbConfig.Host, dbConfig.Port, dbConfig.User, dbConfig.Password, dbConfig.DBName)
 
 	var err error
 	db, err = sql.Open("postgres", psqlInfo)
