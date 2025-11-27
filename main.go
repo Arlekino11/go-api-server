@@ -77,6 +77,8 @@ func main() {
 
 	router := mux.NewRouter()
 
+	router.Use(Logger)
+
 	router.HandleFunc("/", homeHandler).Methods("GET")
 	router.HandleFunc("/users", getUsersHandler).Methods("GET")
 	router.HandleFunc("/users", createUserHandler).Methods("POST")
@@ -127,12 +129,12 @@ func createUserHandler(w http.ResponseWriter, r *http.Request) {
 	var user User
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
-		http.Error(w, "Неверный JSON", http.StatusBadRequest)
+		WriteError(w, http.StatusBadRequest, CodeValidationError, "Invalid JSON format")
 		return
 	}
 
 	if user.Name == "" || user.Email == "" {
-		http.Error(w, "Имя и Email обязательны", http.StatusBadRequest)
+		WriteError(w, http.StatusBadRequest, CodeValidationError, "Name and EMail are required")
 		return
 	}
 
@@ -144,8 +146,7 @@ func createUserHandler(w http.ResponseWriter, r *http.Request) {
 	id := 0
 	err = db.QueryRow(sqlStatement, user.Name, user.Email).Scan(&id)
 	if err != nil {
-		log.Printf("Ошибка вставки: %v", err)
-		http.Error(w, "Ошибка при создании пользователя", http.StatusInternalServerError)
+		DatabaseError(w, err, "create user")
 		return
 	}
 
@@ -164,7 +165,7 @@ func getUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		http.Error(w, "Неверный id дользователя", http.StatusBadRequest)
+		WriteError(w, http.StatusBadRequest, CodeValidationError, "invalid user ID format")
 		return
 	}
 
@@ -172,10 +173,9 @@ func getUserHandler(w http.ResponseWriter, r *http.Request) {
 	err = db.QueryRow("SELECT id, name, email FROM users WHERE id = $1", id).Scan(&user.ID, &user.Name, &user.Email)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			http.Error(w, "Пользователь не найден", http.StatusNotFound)
+			WriteError(w, http.StatusNotFound, CodeNotFound, "user not found")
 		} else {
-			log.Printf("Ошибка запроса: %v", err)
-			http.Error(w, "Внутренняя ошибка сервера", http.StatusInternalServerError)
+			DatabaseError(w, err, "get user")
 		}
 		return
 	}

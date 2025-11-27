@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDatabaseConnection(t *testing.T) {
+func TestDataBaseConnection(t *testing.T) {
 	initTestDB()
 	defer db.Close()
 
@@ -17,8 +17,7 @@ func TestDatabaseConnection(t *testing.T) {
 }
 
 func TestTableExists(t *testing.T) {
-	initTestDB()
-	defer db.Close()
+	setupTest(t)
 
 	var tableExists bool
 	err := db.QueryRow(`
