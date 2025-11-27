@@ -24,7 +24,7 @@ jobs:
           --health-timeout 5s
           --health-retries 5
         ports:
-          - 5432:5432
+          - 5433:5432
 
     steps:
       - uses: actions/checkout@v3
@@ -41,7 +41,7 @@ jobs:
         run: go test -v ./...
         env:
           DB_HOST: localhost
-          DB_PORT: 5432
+          DB_PORT: 5433
           DB_USER: postgres
           DB_PASSWORD: admin
           DB_NAME: go_learning_test
