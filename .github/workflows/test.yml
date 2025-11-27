@@ -42,8 +42,8 @@ jobs:
           PGPASSWORD=admin psql -h localhost -p 5433 -U postgres -d go_learning_test -c "
           CREATE TABLE IF NOT EXISTS users (
           id SERIAL PRIMARY KEY,
-          name VARCHAR(100) NOT NULL
-          email VARCHAR(100) UNIQUE NOT NULL
+          name VARCHAR(100) NOT NULL,
+          email VARCHAR(100) UNIQUE NOT NULL,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
           );"
 
